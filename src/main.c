@@ -39,7 +39,7 @@ void receber_modo_jogo( char *string, dados *dado );
 void receber_jogada_atual( char *string, dados *dado );
 void receber_jogadas( char *string, dados *dado );
 
-void add_jogadas_ao_tabuleiro( jogada jogo, int *tabuleiro );
+void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro );
 void add_atual_as_jogadas( dados *dado );
 
 int main() {
@@ -53,10 +53,16 @@ int main() {
     data = getenv( "CONTENT_LENGTH" );
     receber_dados( data, &dado );
 
-    /*if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
-        add_jogadas_ao_tabuleiro( dado.atual, tabuleiro );
-        add_atual_as_jogadas( &dado );
-    }*/
+    add_jogadas_ao_tabuleiro( &dado, tabuleiro );
+
+    if( dado.atual.ponto.linha != -1 && dado.atual.ponto.coluna != -1 ) {
+        printf( "Linha:%d Coluna:%d\n", dado.atual.ponto.linha, dado.atual.ponto.coluna );
+        if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
+            printf( "<p><br>Vazio:sim</p>" );
+            add_atual_as_jogadas( &dado );
+            add_jogadas_ao_tabuleiro( &dado, tabuleiro );
+        }
+    }
 
     print_jogo( &dado, tabuleiro );
 
@@ -69,6 +75,9 @@ void receber_dados( char *data, dados *dado ) {
     unsigned int tamanho;
     char *string;
     int i;
+
+    dado->atual.ponto.coluna = -1;
+    dado->atual.ponto.linha = -1;
 
     if( data != NULL && sscanf( data, "%d", &tamanho ) == 1 ) {
         string = calloc( tamanho + 1, sizeof( char ) );
@@ -83,14 +92,16 @@ void receber_dados( char *data, dados *dado ) {
         receber_modo_jogo( string, dado );
         receber_jogada_atual( string, dado );
         receber_jogadas( string, dado );
+
         dado->atual.jogador = determinar_jogador( dado );
 
-        printf( "MODO:%d\n", dado->modo_jogo );
-        printf( "JOGADA ATUAL:linha=%d coluna=%d\n",
+        printf( "<p>MODO:%d\n", dado->modo_jogo );
+        printf( "Jogador atual:%d\n", dado->atual.jogador );
+        printf( "JOGADA ATUAL:linha=%d coluna=%d\n</p>",
                 dado->atual.ponto.linha,
                 dado->atual.ponto.coluna );
 
-        for( i = 0; i < MAX; i++ ) {
+        for( i = 0; i < dado->quantidade_jogadas; i++ ) {
             printf( "<p>Jogador: %d</p>", dado->jogadas[i].jogador );
             printf( "<p>Linha: %d  Coluna: %d</p><br>",
                     dado->jogadas[i].ponto.linha,
@@ -102,15 +113,22 @@ void receber_dados( char *data, dados *dado ) {
 }
 
 unsigned int determinar_jogador( dados *dado ) {
-    if( dado->jogadas[dado->quantidade_jogadas - 1].jogador % 2 == 0 ) {
+    if( dado->quantidade_jogadas == 0 ||
+        dado->jogadas[dado->quantidade_jogadas - 1].jogador % 2 == 0 ) {
         return P1;
     } else {
         return P2;
     }
 }
 
-void add_jogadas_ao_tabuleiro( jogada jogo, int *tabuleiro ) {
-    tabuleiro[jogo.ponto.linha + jogo.ponto.coluna] = jogo.jogador;
+void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro ) {
+    int i;
+    int linha, coluna;
+    for( i = 0; i < dado->quantidade_jogadas; i++ ) {
+        linha = dado->jogadas[i].ponto.linha;
+        coluna = dado->jogadas[i].ponto.coluna;
+        tabuleiro[LIN * linha + coluna] = dado->jogadas[i].jogador;
+    }
 }
 
 void add_atual_as_jogadas( dados *dado ) {
@@ -127,7 +145,12 @@ void receber_modo_jogo( char *string, dados *dado ) {
 void receber_jogada_atual( char *string, dados *dado ) {
     char *p;
     p = strstr( string, "x=" );
-    sscanf( p, "x=%d&y=%d", &dado->atual.ponto.coluna, &dado->atual.ponto.linha );
+    if( p ) {
+        if( !sscanf( p, "x=%d&y=%d", &dado->atual.ponto.coluna, &dado->atual.ponto.linha ) ) {
+            dado->atual.ponto.coluna = -1;
+            dado->atual.ponto.linha = -1;
+        }
+    }
 }
 
 void receber_jogadas( char *string, dados *dado ) {
@@ -135,20 +158,19 @@ void receber_jogadas( char *string, dados *dado ) {
     int i = 0;
     p = strstr( string, "jogadas=" );
     p += strlen( "jogadas=" );
-
     if( *( p + 1 ) != '\0' ) {
-        while( i < MAX &&
-               sscanf( p,
+        while( sscanf( p,
                        "%d_%d_%d-",
                        &dado->jogadas[i].jogador,
                        &dado->jogadas[i].ponto.linha,
-                       &dado->jogadas[i].ponto.coluna ) ) {
+                       &dado->jogadas[i].ponto.coluna ) > 0 ) {
             i++;
             p = strstr( p, "-" ) + 1;
         }
         dado->quantidade_jogadas = i;
     } else {
         dado->jogadas[0].jogador = -1;
+        dado->quantidade_jogadas = 0;
     }
 }
 
@@ -194,5 +216,5 @@ void print_form( dados *dado ) {
 }
 
 bool esta_vazio( int *tabuleiro, coordenadas posicao ) {
-    return tabuleiro[LIN * posicao.linha + posicao.coluna];
+    return !tabuleiro[LIN * posicao.linha + posicao.coluna];
 }
