@@ -56,9 +56,7 @@ int main() {
     add_jogadas_ao_tabuleiro( &dado, tabuleiro );
 
     if( dado.atual.ponto.linha != -1 && dado.atual.ponto.coluna != -1 ) {
-        printf( "Linha:%d Coluna:%d\n", dado.atual.ponto.linha, dado.atual.ponto.coluna );
         if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
-            printf( "<p><br>Vazio:sim</p>" );
             add_atual_as_jogadas( &dado );
             add_jogadas_ao_tabuleiro( &dado, tabuleiro );
         }
@@ -74,7 +72,6 @@ int main() {
 void receber_dados( char *data, dados *dado ) {
     unsigned int tamanho;
     char *string;
-    int i;
 
     dado->atual.ponto.coluna = -1;
     dado->atual.ponto.linha = -1;
@@ -87,26 +84,11 @@ void receber_dados( char *data, dados *dado ) {
 
         fgets( string, tamanho + 1, stdin );
 
-        printf( "<p>Stdin:%s</p>\n", string );
-
         receber_modo_jogo( string, dado );
         receber_jogada_atual( string, dado );
         receber_jogadas( string, dado );
 
         dado->atual.jogador = determinar_jogador( dado );
-
-        printf( "<p>MODO:%d\n", dado->modo_jogo );
-        printf( "Jogador atual:%d\n", dado->atual.jogador );
-        printf( "JOGADA ATUAL:linha=%d coluna=%d\n</p>",
-                dado->atual.ponto.linha,
-                dado->atual.ponto.coluna );
-
-        for( i = 0; i < dado->quantidade_jogadas; i++ ) {
-            printf( "<p>Jogador: %d</p>", dado->jogadas[i].jogador );
-            printf( "<p>Linha: %d  Coluna: %d</p><br>",
-                    dado->jogadas[i].ponto.linha,
-                    dado->jogadas[i].ponto.coluna );
-        }
 
         free( string );
     }
