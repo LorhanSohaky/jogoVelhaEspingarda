@@ -22,6 +22,7 @@ typedef struct {
 
 typedef struct {
     unsigned int modo_jogo;
+    unsigned int quantidade_jogadas;
     jogada jogadas[MAX];
     coordenadas ponto;
 } dados;
@@ -33,6 +34,7 @@ void print_form( int *tabuleiro );
 void receber_dados( char *data, dados *dado );
 void receber_modo_jogo( char *string, dados *dado );
 void receber_jogada_atual( char *string, dados *dado );
+void receber_jogadas( char *string, dados *dado );
 
 int main() {
     dados dado;
@@ -55,6 +57,7 @@ int main() {
 void receber_dados( char *data, dados *dado ) {
     unsigned int tamanho;
     char *string;
+    int i;
 
     if( data != NULL && sscanf( data, "%d", &tamanho ) == 1 ) {
         string = calloc( tamanho + 1, sizeof( char ) );
@@ -68,9 +71,17 @@ void receber_dados( char *data, dados *dado ) {
 
         receber_modo_jogo( string, dado );
         receber_jogada_atual( string, dado );
+        receber_jogadas( string, dado );
 
         printf( "MODO:%d\n", dado->modo_jogo );
         printf( "JOGADA ATUAL:linha=%d coluna=%d\n", dado->ponto.linha, dado->ponto.coluna );
+
+        for( i = 0; i < MAX; i++ ) {
+            printf( "<p>Jogador: %d</p>", dado->jogadas[i].jogador );
+            printf( "<p>Linha: %d  Coluna: %d</p><br>",
+                    dado->jogadas[i].ponto.linha,
+                    dado->jogadas[i].ponto.coluna );
+        }
 
         free( string );
     }
@@ -86,6 +97,28 @@ void receber_jogada_atual( char *string, dados *dado ) {
     char *p;
     p = strstr( string, "x=" );
     sscanf( p, "x=%d&y=%d", &dado->ponto.coluna, &dado->ponto.linha );
+}
+
+void receber_jogadas( char *string, dados *dado ) {
+    char *p;
+    int i = 0;
+    p = strstr( string, "jogadas=" );
+    p += strlen( "jogadas=" );
+
+    if( *( p + 1 ) != '\0' ) {
+        while( i < MAX &&
+               sscanf( p,
+                       "%d_%d_%d-",
+                       &dado->jogadas[i].jogador,
+                       &dado->jogadas[i].ponto.linha,
+                       &dado->jogadas[i].ponto.coluna ) ) {
+            i++;
+            p = strstr( p, "-" ) + 1;
+        }
+        dado->quantidade_jogadas = i;
+    } else {
+        dado->jogadas[0].jogador = -1;
+    }
 }
 
 void print_tabuleiro( int *tabuleiro ) {
