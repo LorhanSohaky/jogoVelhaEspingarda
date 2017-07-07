@@ -81,10 +81,18 @@ unsigned int receber_modo_jogo( char *string ) {
 }
 
 void print_tabuleiro( int *tabuleiro ) {
+    int i, j;
+
     printf( "<table id=\"tabuleiro\">" );
-    printf( "<tr><td>%d</td><td>%d</td><td>%d<td></tr>", tabuleiro[0], tabuleiro[1], tabuleiro[2] );
-    printf( "<tr><td>%d</td><td>%d</td><td>%d<td></tr>", tabuleiro[3], tabuleiro[4], tabuleiro[5] );
-    printf( "<tr><td>%d</td><td>%d</td><td>%d<td></tr>", tabuleiro[6], tabuleiro[7], tabuleiro[8] );
+
+    for( i = 0; i < LIN; i++ ) {
+        printf( "<tr>" );
+        for( j = 0; j < COL; j++ ) {
+            printf( "<td>%d</td>", tabuleiro[LIN * i + j] );
+        }
+        printf( "</tr>" );
+    }
+
     printf( "</table>" );
 }
 
