@@ -8,7 +8,7 @@
 #define MAX ( LIN ) * ( COL )
 
 enum { P1 = 1, P2 = 2 };
-enum { PVP = 1, PC = 2 };
+enum { PVP = 1, PC = 2 } modo_jogo;
 
 typedef struct {
     unsigned int linha;
@@ -30,41 +30,54 @@ bool esta_vazio( int *tabuleiro, coordenadas posicao );
 void print_tabuleiro( int *tabuleiro );
 void print_jogo( int *tabuleiro );
 void print_form( int *tabuleiro );
+void receber_dados( char *data, dados *dado );
+unsigned int receber_modo_jogo( char *string );
 
 int main() {
+    dados dado;
     char *data;
-    char *string;
-
     int *tabuleiro = calloc( MAX, sizeof( int ) );
-    unsigned int tamanho;
 
     printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
     printf( "<TITLE>Jogo da velha</TITLE>\n" );
 
     data = getenv( "CONTENT_LENGTH" );
+    receber_dados( data, &dado );
+
+    print_jogo( tabuleiro );
+
+    free( tabuleiro );
+
+    return 0;
+}
+
+void receber_dados( char *data, dados *dado ) {
+    unsigned int tamanho;
+    char *string;
+
     if( data != NULL && sscanf( data, "%d", &tamanho ) == 1 ) {
         string = calloc( tamanho + 1, sizeof( char ) );
         if( !string ) {
-            free( tabuleiro );
-            return 1;
+            return;
         }
 
         fgets( string, tamanho + 1, stdin );
 
         printf( "<p>Stdin:%s</p>\n", string );
+
+        dado->modo_jogo = receber_modo_jogo( string );
+
+        printf( "MODO:%d\n", dado->modo_jogo );
+
+        free( string );
     }
-
-    print_jogo( tabuleiro );
-
-    free( tabuleiro );
-    free( string );
-
-    return 0;
 }
 
-dados receber_dados( char *data ) {
-    dados post;
-    return post;
+unsigned int receber_modo_jogo( char *string ) {
+    int modo;
+
+    sscanf( string, "modo=%d%*s", &modo );
+    return modo;
 }
 
 void print_tabuleiro( int *tabuleiro ) {
@@ -82,6 +95,7 @@ void print_jogo( int *tabuleiro ) {
 
 void print_form( int *tabuleiro ) {
     printf( "<form method=\"POST\" action=\"main\">" );
+    printf( "<input type=\"hidden\" name=\"modo\" value=\"10\">" );
     printf( "Coordenada x: <input type=\"number\" name=\"x\"><br>" );
     printf( "Coordenada y: <input type=\"number\" name=\"y\"><br>" );
     printf( "<input type=\"submit\" value=\"Enviar\">" );
@@ -96,9 +110,6 @@ void print_form( int *tabuleiro ) {
     printf( "\">" );
 }
 
-void ler_modo_jogo() {
-}
-
 bool esta_vazio( int *tabuleiro, coordenadas posicao ) {
-    return tabuleiro[3 * posicao.linha + posicao.coluna];
+    return tabuleiro[LIN * posicao.linha + posicao.coluna];
 }
