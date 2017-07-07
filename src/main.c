@@ -1,10 +1,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define max 9
-#define lin 3
-#define col 3
+#define MAX 9
+#define LIN 3
+#define COL 3
 
 enum { P1 = 1, P2 = 2 };
 
@@ -19,6 +20,32 @@ typedef struct {
 } jogada;
 
 bool esta_vazio( int *tabuleiro, coordenadas posicao );
+void print_tabuleiro( int *tabuleiro );
+void print_jogo( int *tabuleiro );
+void print_form( int *tabuleiro );
+
+int main() {
+    char *data;
+    int c[9];
+    char vet[300];
+    unsigned int tamanho;
+
+    int *tabuleiro = c;
+    printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
+    printf( "<TITLE>Jogo da velha</TITLE>\n" );
+
+    data = getenv( "QUERY_STRING" );
+    printf( "<p>Pointer:%p</p>", data );
+    if( data != NULL || sscanf( data, "%d", &tamanho ) == 1 ) {
+        sscanf( data, "%d", &tamanho );
+        fgets( vet, tamanho + 1, stdin );
+        printf( "<p>Stdin:%s</p>\n", vet );
+    }
+
+    print_jogo( tabuleiro );
+
+    return 0;
+}
 
 void print_tabuleiro( int *tabuleiro ) {
     printf( "<p> %d | %d | %d </p>", tabuleiro[0], tabuleiro[1], tabuleiro[2] );
@@ -30,6 +57,7 @@ void print_tabuleiro( int *tabuleiro ) {
 
 void print_jogo( int *tabuleiro ) {
     print_tabuleiro( tabuleiro );
+    print_form( tabuleiro );
 }
 
 void print_form( int *tabuleiro ) {
@@ -40,50 +68,12 @@ void print_form( int *tabuleiro ) {
 
     printf( "<input type=\"hidden\" name=\"jogadas\" value=\"" );
     int i, j;
-    for( i = 0; i < lin; i++ ) {
-        for( j = 0; j < col; j++ ) {
-            printf( "%d_%d_%d&", tabuleiro[lin * i + j], i, j );
+    for( i = 0; i < LIN; i++ ) {
+        for( j = 0; j < COL; j++ ) {
+            printf( "%d_%d_%d-", tabuleiro[LIN * i + j], i, j );
         }
     }
     printf( "\">" );
-}
-
-int main() {
-    char *data;
-    char vet[300];
-
-    unsigned int tamanho;
-
-    int *tabuleiro = calloc( lin * col, sizeof( int ) );
-    printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
-    printf( "<TITLE>Jogo da velha</TITLE>\n" );
-
-    data = getenv( "QUERY_STRING" );
-    sscanf( data, "%d", &tamanho );
-    fgets( vet, tamanho + 1, stdin );
-
-    printf( "<p>Stdin:%s</p>\n", vet );
-
-    if( data ) {
-        printf( "<p>veio</p>" );
-        printf( "<p>%s</p>", data );
-    }
-
-    coordenadas posicao;
-    posicao.linha = 1;
-    posicao.coluna = 0;
-    printf( "<p>%d</p>\n", esta_vazio( tabuleiro, posicao ) );
-    int k = 1;
-    for( int i = 0; i < 3; i++ ) {
-        for( int j = 0; j < 3; j++ ) {
-            tabuleiro[3 * i + j] = 0;
-        }
-    }
-
-    print_jogo( tabuleiro );
-    print_form( tabuleiro );
-
-    return 0;
 }
 
 void ler_modo_jogo() {
@@ -94,7 +84,7 @@ bool esta_vazio( int *tabuleiro, coordenadas posicao ) {
 }
 
 bool init( int *tabuleiro ) {
-    tabuleiro = calloc( max, sizeof( int ) );
+    tabuleiro = calloc( MAX, sizeof( int ) );
 
     return tabuleiro;
 }
