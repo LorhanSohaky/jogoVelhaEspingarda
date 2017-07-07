@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX 9
 #define LIN 3
 #define COL 3
+#define MAX ( LIN ) * ( COL )
 
 enum { P1 = 1, P2 = 2 };
+enum { PVP = 1, PC = 2 };
 
 typedef struct {
     unsigned int linha;
@@ -19,6 +20,12 @@ typedef struct {
     coordenadas ponto;
 } jogada;
 
+typedef struct {
+    unsigned int modo_jogo;
+    jogada jogadas[MAX];
+    jogada atual;
+} dados;
+
 bool esta_vazio( int *tabuleiro, coordenadas posicao );
 void print_tabuleiro( int *tabuleiro );
 void print_jogo( int *tabuleiro );
@@ -26,25 +33,38 @@ void print_form( int *tabuleiro );
 
 int main() {
     char *data;
-    int c[9];
-    char vet[300];
+    char *string;
+
+    int *tabuleiro = calloc( MAX, sizeof( int ) );
     unsigned int tamanho;
 
-    int *tabuleiro = c;
     printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
     printf( "<TITLE>Jogo da velha</TITLE>\n" );
 
-    data = getenv( "QUERY_STRING" );
-    printf( "<p>Pointer:%p</p>", data );
-    if( data != NULL || sscanf( data, "%d", &tamanho ) == 1 ) {
-        sscanf( data, "%d", &tamanho );
-        fgets( vet, tamanho + 1, stdin );
-        printf( "<p>Stdin:%s</p>\n", vet );
+    data = getenv( "CONTENT_LENGTH" );
+    if( data != NULL && sscanf( data, "%d", &tamanho ) == 1 ) {
+        string = calloc( tamanho + 1, sizeof( char ) );
+        if( !string ) {
+            free( tabuleiro );
+            return 1;
+        }
+
+        fgets( string, tamanho + 1, stdin );
+
+        printf( "<p>Stdin:%s</p>\n", string );
     }
 
     print_jogo( tabuleiro );
 
+    free( tabuleiro );
+    free( string );
+
     return 0;
+}
+
+dados receber_dados( char *data ) {
+    dados post;
+    return post;
 }
 
 void print_tabuleiro( int *tabuleiro ) {
@@ -81,10 +101,4 @@ void ler_modo_jogo() {
 
 bool esta_vazio( int *tabuleiro, coordenadas posicao ) {
     return tabuleiro[3 * posicao.linha + posicao.coluna];
-}
-
-bool init( int *tabuleiro ) {
-    tabuleiro = calloc( MAX, sizeof( int ) );
-
-    return tabuleiro;
 }
