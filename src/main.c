@@ -77,7 +77,9 @@ void receber_dados( char *data, dados *dado ) {
 }
 
 void receber_modo_jogo( char *string, dados *dado ) {
-    sscanf( string, "modo=%d%*s", &dado->modo_jogo );
+    char *p;
+    p = strstr( string, "modo=" );
+    sscanf( p, "modo=%d%*s", &dado->modo_jogo );
 }
 
 void receber_jogada_atual( char *string, dados *dado ) {
