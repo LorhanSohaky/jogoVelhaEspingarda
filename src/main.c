@@ -81,11 +81,11 @@ unsigned int receber_modo_jogo( char *string ) {
 }
 
 void print_tabuleiro( int *tabuleiro ) {
-    printf( "<p> %d | %d | %d </p>", tabuleiro[0], tabuleiro[1], tabuleiro[2] );
-    printf( "<p> -------------</p>" );
-    printf( "<p> %d | %d | %d </p>", tabuleiro[3], tabuleiro[4], tabuleiro[5] );
-    printf( "<p> -------------</p>" );
-    printf( "<p> %d | %d | %d </p>", tabuleiro[6], tabuleiro[7], tabuleiro[8] );
+    printf( "<table id=\"tabuleiro\">" );
+    printf( "<tr><td>%d</td><td>%d</td><td>%d<td></tr>", tabuleiro[0], tabuleiro[1], tabuleiro[2] );
+    printf( "<tr><td>%d</td><td>%d</td><td>%d<td></tr>", tabuleiro[3], tabuleiro[4], tabuleiro[5] );
+    printf( "<tr><td>%d</td><td>%d</td><td>%d<td></tr>", tabuleiro[6], tabuleiro[7], tabuleiro[8] );
+    printf( "</table>" );
 }
 
 void print_jogo( int *tabuleiro ) {
