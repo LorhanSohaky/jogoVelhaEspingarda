@@ -8,7 +8,7 @@
 #define MAX ( LIN ) * ( COL )
 
 enum { P1 = 1, P2 = 2 };
-enum { PVP = 1, PC = 2 } modo_jogo;
+enum { PVP = 1, PC = 2 };
 
 typedef struct {
     unsigned int linha;
@@ -24,17 +24,23 @@ typedef struct {
     unsigned int modo_jogo;
     unsigned int quantidade_jogadas;
     jogada jogadas[MAX];
-    coordenadas ponto;
+    jogada atual;
 } dados;
 
 bool esta_vazio( int *tabuleiro, coordenadas posicao );
+unsigned int determinar_jogador( dados *dado );
+
 void print_tabuleiro( int *tabuleiro );
 void print_jogo( dados *dado, int *tabuleiro );
 void print_form( dados *dado );
+
 void receber_dados( char *data, dados *dado );
 void receber_modo_jogo( char *string, dados *dado );
 void receber_jogada_atual( char *string, dados *dado );
 void receber_jogadas( char *string, dados *dado );
+
+void add_jogadas_ao_tabuleiro( jogada jogo, int *tabuleiro );
+void add_atual_as_jogadas( dados *dado );
 
 int main() {
     dados dado;
@@ -46,6 +52,11 @@ int main() {
 
     data = getenv( "CONTENT_LENGTH" );
     receber_dados( data, &dado );
+
+    /*if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
+        add_jogadas_ao_tabuleiro( dado.atual, tabuleiro );
+        add_atual_as_jogadas( &dado );
+    }*/
 
     print_jogo( &dado, tabuleiro );
 
@@ -72,9 +83,12 @@ void receber_dados( char *data, dados *dado ) {
         receber_modo_jogo( string, dado );
         receber_jogada_atual( string, dado );
         receber_jogadas( string, dado );
+        dado->atual.jogador = determinar_jogador( dado );
 
         printf( "MODO:%d\n", dado->modo_jogo );
-        printf( "JOGADA ATUAL:linha=%d coluna=%d\n", dado->ponto.linha, dado->ponto.coluna );
+        printf( "JOGADA ATUAL:linha=%d coluna=%d\n",
+                dado->atual.ponto.linha,
+                dado->atual.ponto.coluna );
 
         for( i = 0; i < MAX; i++ ) {
             printf( "<p>Jogador: %d</p>", dado->jogadas[i].jogador );
@@ -87,6 +101,23 @@ void receber_dados( char *data, dados *dado ) {
     }
 }
 
+unsigned int determinar_jogador( dados *dado ) {
+    if( dado->jogadas[dado->quantidade_jogadas - 1].jogador % 2 == 0 ) {
+        return P1;
+    } else {
+        return P2;
+    }
+}
+
+void add_jogadas_ao_tabuleiro( jogada jogo, int *tabuleiro ) {
+    tabuleiro[jogo.ponto.linha + jogo.ponto.coluna] = jogo.jogador;
+}
+
+void add_atual_as_jogadas( dados *dado ) {
+    dado->jogadas[dado->quantidade_jogadas] = dado->atual;
+    dado->quantidade_jogadas++;
+}
+
 void receber_modo_jogo( char *string, dados *dado ) {
     char *p;
     p = strstr( string, "modo=" );
@@ -96,7 +127,7 @@ void receber_modo_jogo( char *string, dados *dado ) {
 void receber_jogada_atual( char *string, dados *dado ) {
     char *p;
     p = strstr( string, "x=" );
-    sscanf( p, "x=%d&y=%d", &dado->ponto.coluna, &dado->ponto.linha );
+    sscanf( p, "x=%d&y=%d", &dado->atual.ponto.coluna, &dado->atual.ponto.linha );
 }
 
 void receber_jogadas( char *string, dados *dado ) {
