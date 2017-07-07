@@ -23,7 +23,7 @@ typedef struct {
 typedef struct {
     unsigned int modo_jogo;
     jogada jogadas[MAX];
-    jogada atual;
+    coordenadas ponto;
 } dados;
 
 bool esta_vazio( int *tabuleiro, coordenadas posicao );
@@ -31,7 +31,8 @@ void print_tabuleiro( int *tabuleiro );
 void print_jogo( int *tabuleiro );
 void print_form( int *tabuleiro );
 void receber_dados( char *data, dados *dado );
-unsigned int receber_modo_jogo( char *string );
+void receber_modo_jogo( char *string, dados *dado );
+void receber_jogada_atual( char *string, dados *dado );
 
 int main() {
     dados dado;
@@ -65,19 +66,24 @@ void receber_dados( char *data, dados *dado ) {
 
         printf( "<p>Stdin:%s</p>\n", string );
 
-        dado->modo_jogo = receber_modo_jogo( string );
+        receber_modo_jogo( string, dado );
+        receber_jogada_atual( string, dado );
 
         printf( "MODO:%d\n", dado->modo_jogo );
+        printf( "JOGADA ATUAL:linha=%d coluna=%d\n", dado->ponto.linha, dado->ponto.coluna );
 
         free( string );
     }
 }
 
-unsigned int receber_modo_jogo( char *string ) {
-    int modo;
+void receber_modo_jogo( char *string, dados *dado ) {
+    sscanf( string, "modo=%d%*s", &dado->modo_jogo );
+}
 
-    sscanf( string, "modo=%d%*s", &modo );
-    return modo;
+void receber_jogada_atual( char *string, dados *dado ) {
+    char *p;
+    p = strstr( string, "x=" );
+    sscanf( p, "x=%d&y=%d", &dado->ponto.coluna, &dado->ponto.linha );
 }
 
 void print_tabuleiro( int *tabuleiro ) {
