@@ -29,8 +29,8 @@ typedef struct {
 
 bool esta_vazio( int *tabuleiro, coordenadas posicao );
 void print_tabuleiro( int *tabuleiro );
-void print_jogo( int *tabuleiro );
-void print_form( int *tabuleiro );
+void print_jogo( dados *dado, int *tabuleiro );
+void print_form( dados *dado );
 void receber_dados( char *data, dados *dado );
 void receber_modo_jogo( char *string, dados *dado );
 void receber_jogada_atual( char *string, dados *dado );
@@ -47,7 +47,7 @@ int main() {
     data = getenv( "CONTENT_LENGTH" );
     receber_dados( data, &dado );
 
-    print_jogo( tabuleiro );
+    print_jogo( &dado, tabuleiro );
 
     free( tabuleiro );
 
@@ -137,12 +137,14 @@ void print_tabuleiro( int *tabuleiro ) {
     printf( "</table>" );
 }
 
-void print_jogo( int *tabuleiro ) {
+void print_jogo( dados *dado, int *tabuleiro ) {
     print_tabuleiro( tabuleiro );
-    print_form( tabuleiro );
+    print_form( dado );
 }
 
-void print_form( int *tabuleiro ) {
+void print_form( dados *dado ) {
+    int i;
+
     printf( "<form method=\"POST\" action=\"main\">" );
     printf( "<input type=\"hidden\" name=\"modo\" value=\"10\">" );
     printf( "Coordenada x: <input type=\"number\" name=\"x\"><br>" );
@@ -150,11 +152,12 @@ void print_form( int *tabuleiro ) {
     printf( "<input type=\"submit\" value=\"Enviar\">" );
 
     printf( "<input type=\"hidden\" name=\"jogadas\" value=\"" );
-    int i, j;
-    for( i = 0; i < LIN; i++ ) {
-        for( j = 0; j < COL; j++ ) {
-            printf( "%d_%d_%d-", tabuleiro[LIN * i + j], i, j );
-        }
+
+    for( i = 0; i < dado->quantidade_jogadas; i++ ) {
+        printf( "%d_%d_%d-",
+                dado->jogadas[i].jogador,
+                dado->jogadas[i].ponto.linha,
+                dado->jogadas[i].ponto.coluna );
     }
     printf( "\">" );
 }
