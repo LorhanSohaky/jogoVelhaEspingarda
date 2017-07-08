@@ -162,23 +162,16 @@ int verificar_se_terminou( int *tabuleiro ) {
         }
     }
 
-    // VERIFICAR DIAGONAL PRINCIPAL
-    soma = 0;
-    for( i = 0; i < COL; i++ ) {
-        soma = tabuleiro[LIN * i + i];
-    }
-
-    if( soma / 3.0 == tabuleiro[0] ) {
-        return tabuleiro[0];
-    }
-
     // VERIFICAR DIAGONAL SECUNDARIA
-    for( i = 0, j = LIN; i < LIN, j < COL; i++, j-- ) {
-        soma = tabuleiro[LIN * i + j];
+    if( tabuleiro[LIN * 0 + 2] == tabuleiro[LIN * 1 + 1] &&
+        tabuleiro[LIN * 0 + 2] == tabuleiro[LIN * 2 + 0] ) {
+        return tabuleiro[LIN * 0 + 2];
     }
 
-    if( soma / 3.0 == tabuleiro[COL] ) {
-        return tabuleiro[COL];
+    // VERIFICAR DIAGONAL PRIMARIA
+    if( tabuleiro[LIN * 0 + 0] == tabuleiro[LIN * 1 + 1] &&
+        tabuleiro[LIN * 0 + 0] == tabuleiro[LIN * 2 + 2] ) {
+        return tabuleiro[LIN * 0 + 0];
     }
 
     return 0;
