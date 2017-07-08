@@ -245,7 +245,7 @@ void receber_jogadas( char *string, dados *dado ) {
     if( *( p + 1 ) != '\0' ) {
         int i = 0;
         while( sscanf( p,
-                       "%d_%d_%d-",
+                       "%u_%u_%u-",
                        &dado->jogadas[i].jogador,
                        &dado->jogadas[i].ponto.linha,
                        &dado->jogadas[i].ponto.coluna ) > 0 ) {
