@@ -60,8 +60,6 @@ int main() {
 
     add_jogadas_ao_tabuleiro( &dado, tabuleiro );
 
-    printf( "MODO:%d<br>", dado.modo_jogo );
-
     if( dado.modo_jogo == PC ) {
         dado.atual.jogador = P1;
 
@@ -95,9 +93,9 @@ int main() {
         jogador = verificar_se_terminou( tabuleiro );
         if( dado.modo_jogo == PC ) {
             if( jogador == P1 ) {
-                printf( "<h1>Você é foda</h1>" );
+                printf( "<h1>Você é foda!</h1>" );
             } else {
-                printf( "<h1>Você é um bosta</h1>" );
+                printf( "<h1>Você é um bosta...</h1>" );
             }
         } else {
             if( jogador == P1 ) {
