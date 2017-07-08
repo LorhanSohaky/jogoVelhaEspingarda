@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define LIN 3
 #define COL 3
@@ -29,6 +30,7 @@ typedef struct {
 
 bool esta_vazio( int *tabuleiro, coordenadas posicao );
 unsigned int determinar_jogador( dados *dado );
+jogada sortear_jogaca_pc( jogada atual, int *tabuleiro );
 
 void print_tabuleiro( int *tabuleiro );
 void print_jogo( dados *dado, int *tabuleiro );
@@ -40,7 +42,7 @@ void receber_jogada_atual( char *string, dados *dado );
 void receber_jogadas( char *string, dados *dado );
 
 void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro );
-void add_atual_as_jogadas( dados *dado );
+void add_jogada_as_jogadas( jogada jogo, dados *dado );
 
 int main() {
     dados dado;
@@ -55,9 +57,17 @@ int main() {
 
     add_jogadas_ao_tabuleiro( &dado, tabuleiro );
 
+    if( dado.modo_jogo == PC ) {
+        jogada pc = sortear_jogaca_pc( dado.atual, tabuleiro );
+
+        dado.atual.jogador = P1;
+
+        add_jogada_as_jogadas( pc, &dado );
+    }
+
     if( dado.atual.ponto.linha != -1 && dado.atual.ponto.coluna != -1 ) {
         if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
-            add_atual_as_jogadas( &dado );
+            add_jogada_as_jogadas( dado.atual, &dado );
             add_jogadas_ao_tabuleiro( &dado, tabuleiro );
         }
     }
@@ -67,6 +77,22 @@ int main() {
     free( tabuleiro );
 
     return 0;
+}
+
+jogada sortear_jogaca_pc( jogada atual, int *tabuleiro ) {
+    jogada pc;
+
+    pc.jogador = P2;
+
+    srand( time( NULL ) );
+
+    do {
+        pc.ponto.linha = rand() % LIN;
+        pc.ponto.coluna = rand() % COL;
+    } while( ( pc.ponto.linha == atual.ponto.linha && pc.ponto.coluna == atual.ponto.coluna ) ||
+             !esta_vazio( tabuleiro, pc.ponto ) );
+
+    return pc;
 }
 
 void receber_dados( char *data, dados *dado ) {
@@ -113,8 +139,8 @@ void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro ) {
     }
 }
 
-void add_atual_as_jogadas( dados *dado ) {
-    dado->jogadas[dado->quantidade_jogadas] = dado->atual;
+void add_jogada_as_jogadas( jogada jogo, dados *dado ) {
+    dado->jogadas[dado->quantidade_jogadas] = jogo;
     dado->quantidade_jogadas++;
 }
 
@@ -181,7 +207,7 @@ void print_form( dados *dado ) {
     int i;
 
     printf( "<form method=\"POST\" action=\"main\">" );
-    printf( "<input type=\"hidden\" name=\"modo\" value=\"10\">" );
+    printf( "<input type=\"hidden\" name=\"modo\" value=\"2\">" );
     printf( "Coordenada x: <input type=\"number\" name=\"x\"><br>" );
     printf( "Coordenada y: <input type=\"number\" name=\"y\"><br>" );
     printf( "<input type=\"submit\" value=\"Enviar\">" );
