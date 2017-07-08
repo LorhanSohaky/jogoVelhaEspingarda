@@ -50,7 +50,6 @@ int main() {
     dados dado;
     char *data;
     int *tabuleiro = calloc( MAX, sizeof( int ) );
-    int jogador;
 
     printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
     printf( "<HEAD><TITLE>Jogo da velha</TITLE></HEAD>" );
@@ -63,8 +62,7 @@ int main() {
     if( dado.modo_jogo == PC ) {
         dado.atual.jogador = P1;
 
-        if( dado.atual.ponto.linha >= 0 && dado.atual.ponto.linha < LIN &&
-            dado.atual.ponto.coluna >= 0 && dado.atual.ponto.coluna < COL ) {
+        if( dado.atual.ponto.linha < LIN && dado.atual.ponto.coluna < COL ) {
             if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
                 add_jogada_as_jogadas( dado.atual, &dado );
                 add_jogadas_ao_tabuleiro( &dado, tabuleiro );
@@ -77,8 +75,7 @@ int main() {
             }
         }
     } else {
-        if( dado.atual.ponto.linha >= 0 && dado.atual.ponto.linha < LIN &&
-            dado.atual.ponto.coluna >= 0 && dado.atual.ponto.coluna < COL ) {
+        if( dado.atual.ponto.linha < LIN && dado.atual.ponto.coluna < COL ) {
             if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
                 add_jogada_as_jogadas( dado.atual, &dado );
                 add_jogadas_ao_tabuleiro( &dado, tabuleiro );
@@ -90,7 +87,8 @@ int main() {
     if( !verificar_se_terminou( tabuleiro ) ) {
         print_jogo( &dado, tabuleiro );
     } else {
-        jogador = verificar_se_terminou( tabuleiro );
+        int jogador = verificar_se_terminou( tabuleiro );
+
         if( dado.modo_jogo == PC ) {
             if( jogador == P1 ) {
                 printf( "<h1>Você é foda!</h1>" );
@@ -177,13 +175,12 @@ int verificar_se_terminou( int *tabuleiro ) {
 
 void receber_dados( char *data, dados *dado ) {
     unsigned int tamanho;
-    char *string;
 
     dado->atual.ponto.coluna = -1;
     dado->atual.ponto.linha = -1;
 
-    if( data != NULL && sscanf( data, "%d", &tamanho ) == 1 ) {
-        string = calloc( tamanho + 1, sizeof( char ) );
+    if( data != NULL && sscanf( data, "%u", &tamanho ) == 1 ) {
+        char *string = calloc( tamanho + 1, sizeof( char ) );
         if( !string ) {
             return;
         }
@@ -211,11 +208,9 @@ unsigned int determinar_jogador( dados *dado ) {
 
 void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro ) {
     int i;
-    int linha, coluna;
     for( i = 0; i < dado->quantidade_jogadas; i++ ) {
-        linha = dado->jogadas[i].ponto.linha;
-        coluna = dado->jogadas[i].ponto.coluna;
-        tabuleiro[LIN * linha + coluna] = dado->jogadas[i].jogador;
+        tabuleiro[LIN * dado->jogadas[i].ponto.linha + dado->jogadas[i].ponto.coluna] =
+            dado->jogadas[i].jogador;
     }
 }
 
@@ -227,16 +222,16 @@ void add_jogada_as_jogadas( jogada jogo, dados *dado ) {
 void receber_modo_jogo( char *string, dados *dado ) {
     char *p;
     p = strstr( string, "modo=" );
-    sscanf( p, "modo=%d%*s", &dado->modo_jogo );
+    sscanf( p, "modo=%u%*s", &dado->modo_jogo );
 }
 
 void receber_jogada_atual( char *string, dados *dado ) {
     char *p;
     p = strstr( string, "x=" );
     if( p ) {
-        if( !sscanf( p, "x=%d&y=%d", &dado->atual.ponto.coluna, &dado->atual.ponto.linha ) ) {
-            dado->atual.ponto.coluna = -1;
-            dado->atual.ponto.linha = -1;
+        if( !sscanf( p, "x=%u&y=%u", &dado->atual.ponto.coluna, &dado->atual.ponto.linha ) ) {
+            dado->atual.ponto.coluna = 100;
+            dado->atual.ponto.linha = 100;
         }
         dado->atual.ponto.coluna -= 1;
         dado->atual.ponto.linha -= 1;
@@ -245,10 +240,10 @@ void receber_jogada_atual( char *string, dados *dado ) {
 
 void receber_jogadas( char *string, dados *dado ) {
     char *p;
-    int i = 0;
     p = strstr( string, "jogadas=" );
     p += strlen( "jogadas=" );
     if( *( p + 1 ) != '\0' ) {
+        int i = 0;
         while( sscanf( p,
                        "%d_%d_%d-",
                        &dado->jogadas[i].jogador,
@@ -289,7 +284,7 @@ void print_form( dados *dado ) {
     int i;
 
     printf( "<form method=\"POST\" action=\"main\">" );
-    printf( "<input type=\"hidden\" id=\"modo\"name=\"modo\" value=\"%d\">", dado->modo_jogo );
+    printf( "<input type=\"hidden\" id=\"modo\"name=\"modo\" value=\"%u\">", dado->modo_jogo );
     printf( "Coordenada x: <input type=\"number\" name=\"x\"><br>" );
     printf( "Coordenada y: <input type=\"number\" name=\"y\"><br>" );
     printf( "<input type=\"submit\" value=\"Enviar\">" );
@@ -297,7 +292,7 @@ void print_form( dados *dado ) {
     printf( "<input type=\"hidden\" name=\"jogadas\" value=\"" );
 
     for( i = 0; i < dado->quantidade_jogadas; i++ ) {
-        printf( "%d_%d_%d-",
+        printf( "%u_%u_%u-",
                 dado->jogadas[i].jogador,
                 dado->jogadas[i].ponto.linha,
                 dado->jogadas[i].ponto.coluna );
