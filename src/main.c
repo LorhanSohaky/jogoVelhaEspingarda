@@ -29,8 +29,10 @@ typedef struct {
 } dados;
 
 bool esta_vazio( int *tabuleiro, coordenadas posicao );
+bool tabuleiro_cheio( int *tabuleiro );
 unsigned int determinar_jogador( dados *dado );
 jogada sortear_jogaca_pc( jogada atual, int *tabuleiro );
+int verificar_se_terminou( int *tabuleiro );
 
 void print_tabuleiro( int *tabuleiro );
 void print_jogo( dados *dado, int *tabuleiro );
@@ -48,6 +50,7 @@ int main() {
     dados dado;
     char *data;
     int *tabuleiro = calloc( MAX, sizeof( int ) );
+    int jogador;
 
     printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
     printf( "<TITLE>Jogo da velha</TITLE>\n" );
@@ -57,23 +60,53 @@ int main() {
 
     add_jogadas_ao_tabuleiro( &dado, tabuleiro );
 
-    if( dado.modo_jogo == PC ) {
-        jogada pc = sortear_jogaca_pc( dado.atual, tabuleiro );
+    printf( "MODO:%d<br>", dado.modo_jogo );
 
+    if( dado.modo_jogo == PC ) {
         dado.atual.jogador = P1;
 
-        add_jogada_as_jogadas( pc, &dado );
-    }
+        if( dado.atual.ponto.linha > 0 && dado.atual.ponto.linha < LIN &&
+            dado.atual.ponto.coluna > 0 && dado.atual.ponto.coluna < COL ) {
+            if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
+                add_jogada_as_jogadas( dado.atual, &dado );
+                add_jogadas_ao_tabuleiro( &dado, tabuleiro );
 
-    if( dado.atual.ponto.linha != -1 && dado.atual.ponto.coluna != -1 ) {
-        if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
-            add_jogada_as_jogadas( dado.atual, &dado );
-            add_jogadas_ao_tabuleiro( &dado, tabuleiro );
+                if( !verificar_se_terminou( tabuleiro ) && !tabuleiro_cheio( tabuleiro ) ) {
+                    jogada pc = sortear_jogaca_pc( dado.atual, tabuleiro );
+
+                    add_jogada_as_jogadas( pc, &dado ); // Para adicionar a jogada do PC
+                }
+            }
+        }
+    } else {
+        if( dado.atual.ponto.linha > 0 && dado.atual.ponto.linha < LIN &&
+            dado.atual.ponto.coluna > 0 && dado.atual.ponto.coluna < COL ) {
+            if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
+                add_jogada_as_jogadas( dado.atual, &dado );
+                add_jogadas_ao_tabuleiro( &dado, tabuleiro );
+            }
         }
     }
 
-    print_jogo( &dado, tabuleiro );
-
+    add_jogadas_ao_tabuleiro( &dado, tabuleiro );
+    if( !verificar_se_terminou( tabuleiro ) ) {
+        print_jogo( &dado, tabuleiro );
+    } else {
+        jogador = verificar_se_terminou( tabuleiro );
+        if( dado.modo_jogo == PC ) {
+            if( jogador == P1 ) {
+                printf( "<h1>Você é foda</h1>" );
+            } else {
+                printf( "<h1>Você é um bosta</h1>" );
+            }
+        } else {
+            if( jogador == P1 ) {
+                printf( "<h1>Jogador 1 ganhou!</h1>" );
+            } else {
+                printf( "<h1>Jogador 2 ganhou!</h1>" );
+            }
+        }
+    }
     free( tabuleiro );
 
     return 0;
@@ -93,6 +126,59 @@ jogada sortear_jogaca_pc( jogada atual, int *tabuleiro ) {
              !esta_vazio( tabuleiro, pc.ponto ) );
 
     return pc;
+}
+
+bool tabuleiro_cheio( int *tabuleiro ) {
+    int i;
+
+    for( i = 0; i < MAX; i++ ) {
+        if( tabuleiro[i] == 0 ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+int verificar_se_terminou( int *tabuleiro ) {
+    int i, j, soma;
+
+    // VERIFICA LINHA
+    for( i = 0; i < LIN; i++ ) {
+        if( tabuleiro[LIN * i + 0] == tabuleiro[LIN * i + 1] &&
+            tabuleiro[LIN * i + 0] == tabuleiro[LIN * i + 2] ) {
+            return tabuleiro[LIN * i + 0];
+        }
+    }
+
+    // VERIFICA COLUNA
+    for( i = 0; i < COL; i++ ) {
+        if( tabuleiro[LIN * 0 + i] == tabuleiro[LIN * 1 + i] &&
+            tabuleiro[LIN * 0 + i] == tabuleiro[LIN * 2 + i] ) {
+            return tabuleiro[LIN * 0 + i];
+        }
+    }
+
+    // VERIFICAR DIAGONAL PRINCIPAL
+    soma = 0;
+    for( i = 0; i < COL; i++ ) {
+        soma = tabuleiro[LIN * i + i];
+    }
+
+    if( soma / 3.0 == tabuleiro[0] ) {
+        return tabuleiro[0];
+    }
+
+    // VERIFICAR DIAGONAL SECUNDARIA
+    for( i = 0, j = LIN; i < LIN, j < COL; i++, j-- ) {
+        soma = tabuleiro[LIN * i + j];
+    }
+
+    if( soma / 3.0 == tabuleiro[COL] ) {
+        return tabuleiro[COL];
+    }
+
+    return 0;
 }
 
 void receber_dados( char *data, dados *dado ) {
@@ -158,6 +244,8 @@ void receber_jogada_atual( char *string, dados *dado ) {
             dado->atual.ponto.coluna = -1;
             dado->atual.ponto.linha = -1;
         }
+        dado->atual.ponto.coluna -= 1;
+        dado->atual.ponto.linha -= 1;
     }
 }
 
