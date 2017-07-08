@@ -53,7 +53,7 @@ int main() {
     int jogador;
 
     printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
-    printf( "<TITLE>Jogo da velha</TITLE>\n" );
+    printf( "<HEAD><TITLE>Jogo da velha</TITLE></HEAD>" );
 
     data = getenv( "CONTENT_LENGTH" );
     receber_dados( data, &dado );
@@ -65,8 +65,8 @@ int main() {
     if( dado.modo_jogo == PC ) {
         dado.atual.jogador = P1;
 
-        if( dado.atual.ponto.linha > 0 && dado.atual.ponto.linha < LIN &&
-            dado.atual.ponto.coluna > 0 && dado.atual.ponto.coluna < COL ) {
+        if( dado.atual.ponto.linha >= 0 && dado.atual.ponto.linha < LIN &&
+            dado.atual.ponto.coluna >= 0 && dado.atual.ponto.coluna < COL ) {
             if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
                 add_jogada_as_jogadas( dado.atual, &dado );
                 add_jogadas_ao_tabuleiro( &dado, tabuleiro );
@@ -79,8 +79,8 @@ int main() {
             }
         }
     } else {
-        if( dado.atual.ponto.linha > 0 && dado.atual.ponto.linha < LIN &&
-            dado.atual.ponto.coluna > 0 && dado.atual.ponto.coluna < COL ) {
+        if( dado.atual.ponto.linha >= 0 && dado.atual.ponto.linha < LIN &&
+            dado.atual.ponto.coluna >= 0 && dado.atual.ponto.coluna < COL ) {
             if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
                 add_jogada_as_jogadas( dado.atual, &dado );
                 add_jogadas_ao_tabuleiro( &dado, tabuleiro );
@@ -108,6 +108,9 @@ int main() {
         }
     }
     free( tabuleiro );
+
+    printf( "<script type=\"text/javascript\" "
+            "src=\"http://localhost/jogoVelhaEspingarda/src/script.js\"></script>" );
 
     return 0;
 }
@@ -295,7 +298,7 @@ void print_form( dados *dado ) {
     int i;
 
     printf( "<form method=\"POST\" action=\"main\">" );
-    printf( "<input type=\"hidden\" name=\"modo\" value=\"2\">" );
+    printf( "<input type=\"hidden\" id=\"modo\"name=\"modo\" value=\"%d\">", dado->modo_jogo );
     printf( "Coordenada x: <input type=\"number\" name=\"x\"><br>" );
     printf( "Coordenada y: <input type=\"number\" name=\"y\"><br>" );
     printf( "<input type=\"submit\" value=\"Enviar\">" );
