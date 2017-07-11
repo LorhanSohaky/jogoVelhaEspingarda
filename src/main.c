@@ -50,7 +50,6 @@ int main() {
     dados dado;
     char *data;
     int *tabuleiro = calloc( MAX, sizeof( int ) );
-    int jogador;
 
     printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
     printf( "<HEAD><TITLE>Jogo da velha</TITLE>" );
@@ -92,7 +91,7 @@ int main() {
     if( !tabuleiro_cheio( tabuleiro ) && !verificar_se_terminou( tabuleiro ) ) {
         print_jogo( &dado, tabuleiro );
     } else {
-        jogador = verificar_se_terminou( tabuleiro );
+        int jogador = verificar_se_terminou( tabuleiro );
         if( dado.modo_jogo == PC ) {
             if( jogador == P1 ) {
                 printf( "<h1>Você é foda!</h1>" );
@@ -150,10 +149,9 @@ void add_jogada_as_jogadas( jogada jogo, dados *dado ) {
 
 void receber_dados( char *data, dados *dado ) {
     unsigned int tamanho;
-    char *string;
 
     if( data != NULL && sscanf( data, "%d", &tamanho ) == 1 ) {
-        string = calloc( tamanho + 1, sizeof( char ) );
+        char *string = calloc( tamanho + 1, sizeof( char ) );
         if( !string ) {
             return;
         }
@@ -170,8 +168,8 @@ void receber_dados( char *data, dados *dado ) {
     } else {
         dado->modo_jogo = 0;
         dado->quantidade_jogadas = 0;
-        dado->atual.ponto.coluna = 10;
-        dado->atual.ponto.linha = 10;
+        dado->atual.ponto.coluna = 10; // Valor acima do MAX
+        dado->atual.ponto.linha = 10;  // Valor acima do MAX
     }
 }
 
@@ -186,8 +184,9 @@ void receber_jogada_atual( char *string, dados *dado ) {
     p = strstr( string, "x=" );
     if( p ) {
         if( !sscanf( p, "x=%d&y=%d", &dado->atual.ponto.coluna, &dado->atual.ponto.linha ) ) {
-            dado->atual.ponto.coluna = -1;
-            dado->atual.ponto.linha = -1;
+            dado->atual.ponto.coluna = 10; // Valor acima do MAX
+            dado->atual.ponto.linha = 10;  // Valor acima do MAX
+            return;
         }
         dado->atual.ponto.coluna -= 1;
         dado->atual.ponto.linha -= 1;
