@@ -50,9 +50,12 @@ int main() {
     dados dado;
     char *data;
     int *tabuleiro = calloc( MAX, sizeof( int ) );
+    int jogador;
 
     printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
-    printf( "<HEAD><TITLE>Jogo da velha</TITLE></HEAD>" );
+    printf( "<HEAD><TITLE>Jogo da velha</TITLE>" );
+    printf( "<META CHARSET=\"UTF-8\"></HEAD>" );
+    printf( "<BODY>" );
 
     data = getenv( "CONTENT_LENGTH" );
     receber_dados( data, &dado );
@@ -62,7 +65,8 @@ int main() {
     if( dado.modo_jogo == PC ) {
         dado.atual.jogador = P1;
 
-        if( dado.atual.ponto.linha < LIN && dado.atual.ponto.coluna < COL ) {
+        if( dado.atual.ponto.linha >= 0 && dado.atual.ponto.linha < LIN &&
+            dado.atual.ponto.coluna >= 0 && dado.atual.ponto.coluna < COL ) {
             if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
                 add_jogada_as_jogadas( dado.atual, &dado );
                 add_jogadas_ao_tabuleiro( &dado, tabuleiro );
@@ -75,7 +79,8 @@ int main() {
             }
         }
     } else {
-        if( dado.atual.ponto.linha < LIN && dado.atual.ponto.coluna < COL ) {
+        if( dado.atual.ponto.linha >= 0 && dado.atual.ponto.linha < LIN &&
+            dado.atual.ponto.coluna >= 0 && dado.atual.ponto.coluna < COL ) {
             if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
                 add_jogada_as_jogadas( dado.atual, &dado );
                 add_jogadas_ao_tabuleiro( &dado, tabuleiro );
@@ -84,11 +89,10 @@ int main() {
     }
 
     add_jogadas_ao_tabuleiro( &dado, tabuleiro );
-    if( !verificar_se_terminou( tabuleiro ) ) {
+    if( !tabuleiro_cheio( tabuleiro ) && !verificar_se_terminou( tabuleiro ) ) {
         print_jogo( &dado, tabuleiro );
     } else {
-        int jogador = verificar_se_terminou( tabuleiro );
-
+        jogador = verificar_se_terminou( tabuleiro );
         if( dado.modo_jogo == PC ) {
             if( jogador == P1 ) {
                 printf( "<h1>Você é foda!</h1>" );
@@ -98,16 +102,18 @@ int main() {
         } else {
             if( jogador == P1 ) {
                 printf( "<h1>Jogador 1 ganhou!</h1>" );
-            } else {
+            } else if( jogador == P2 ) {
                 printf( "<h1>Jogador 2 ganhou!</h1>" );
+            } else {
+                printf( "<h1>Os dois são uns bostas!</h1>" );
             }
         }
     }
     free( tabuleiro );
 
     printf( "<script type=\"text/javascript\" "
-            "src=\"http://localhost/jogoVelhaEspingarda/src/script.js\"></script>" );
-
+            "src=\"http://cap.dc.ufscar.br/~740951/jogo/script.js\"></script>" );
+    printf( "</BODY>" );
     return 0;
 }
 
@@ -127,6 +133,148 @@ jogada sortear_jogaca_pc( jogada atual, int *tabuleiro ) {
     return pc;
 }
 
+void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro ) {
+    int i;
+    int linha, coluna;
+    for( i = 0; i < dado->quantidade_jogadas; i++ ) {
+        linha = dado->jogadas[i].ponto.linha;
+        coluna = dado->jogadas[i].ponto.coluna;
+        tabuleiro[LIN * linha + coluna] = dado->jogadas[i].jogador;
+    }
+}
+
+void add_jogada_as_jogadas( jogada jogo, dados *dado ) {
+    dado->jogadas[dado->quantidade_jogadas] = jogo;
+    dado->quantidade_jogadas++;
+}
+
+void receber_dados( char *data, dados *dado ) {
+    unsigned int tamanho;
+    char *string;
+
+    if( data != NULL && sscanf( data, "%d", &tamanho ) == 1 ) {
+        string = calloc( tamanho + 1, sizeof( char ) );
+        if( !string ) {
+            return;
+        }
+
+        fgets( string, tamanho + 1, stdin );
+
+        receber_modo_jogo( string, dado );
+        receber_jogada_atual( string, dado );
+        receber_jogadas( string, dado );
+
+        dado->atual.jogador = determinar_jogador( dado );
+
+        free( string );
+    } else {
+        dado->modo_jogo = 0;
+        dado->quantidade_jogadas = 0;
+        dado->atual.ponto.coluna = 10;
+        dado->atual.ponto.linha = 10;
+    }
+}
+
+void receber_modo_jogo( char *string, dados *dado ) {
+    char *p;
+    p = strstr( string, "modo=" );
+    sscanf( p, "modo=%d%*s", &dado->modo_jogo );
+}
+
+void receber_jogada_atual( char *string, dados *dado ) {
+    char *p;
+    p = strstr( string, "x=" );
+    if( p ) {
+        if( !sscanf( p, "x=%d&y=%d", &dado->atual.ponto.coluna, &dado->atual.ponto.linha ) ) {
+            dado->atual.ponto.coluna = -1;
+            dado->atual.ponto.linha = -1;
+        }
+        dado->atual.ponto.coluna -= 1;
+        dado->atual.ponto.linha -= 1;
+    }
+}
+
+void receber_jogadas( char *string, dados *dado ) {
+    char *p;
+    int i = 0;
+    p = strstr( string, "jogadas=" );
+    p += strlen( "jogadas=" );
+    if( *( p + 1 ) != '\0' ) {
+        while( sscanf( p,
+                       "%d_%d_%d-",
+                       &dado->jogadas[i].jogador,
+                       &dado->jogadas[i].ponto.linha,
+                       &dado->jogadas[i].ponto.coluna ) > 0 ) {
+            i++;
+            p = strstr( p, "-" ) + 1;
+        }
+        dado->quantidade_jogadas = i;
+    } else {
+        dado->jogadas[0].jogador = -1;
+        dado->quantidade_jogadas = 0;
+    }
+}
+
+void print_jogo( dados *dado, int *tabuleiro ) {
+    print_tabuleiro( tabuleiro );
+    print_form( dado );
+}
+
+void print_tabuleiro( int *tabuleiro ) {
+    int i, j;
+
+    printf( "<table id=\"tabuleiro\">" );
+
+    for( i = 0; i < LIN; i++ ) {
+        printf( "<tr>" );
+        for( j = 0; j < COL; j++ ) {
+            if( tabuleiro[LIN * i + j] == 0 ) {
+                printf( "<td><img onclick=\"setXY(%u,%u);\" "
+                        "src=\"http://cap.dc.ufscar.br/~740951/jogo/img/vazio.png\" "
+                        "width=\"150px\"></td>",
+                        j + 1,
+                        i + 1 );
+            } else if( tabuleiro[LIN * i + j] == P1 ) {
+                printf( "<td><img src=\"http://cap.dc.ufscar.br/~740951/jogo/img/x.png\" "
+                        "width=\"150px\"></td>",
+                        j + 1,
+                        i + 1 );
+            } else if( tabuleiro[LIN * i + j] == P2 ) {
+                printf( "<td><img src=\"http://cap.dc.ufscar.br/~740951/jogo/img/bola.png\" "
+                        "width=\"150px\"></td>" );
+            }
+        }
+        printf( "</tr>" );
+    }
+
+    printf( "</table>" );
+}
+
+void print_form( dados *dado ) {
+    int i;
+
+    printf( "<form method=\"POST\" id=\"formulario\" action=\"main\">" );
+    printf( "<input type=\"hidden\" id=\"modo\"name=\"modo\" value=\"%d\">", dado->modo_jogo );
+    printf( "<input type=\"hidden\" id=\"x\" name=\"x\"><br>" );
+    printf( "<input type=\"hidden\" id=\"y\" name=\"y\"><br>" );
+
+    printf( "<input type=\"hidden\" name=\"jogadas\" value=\"" );
+
+    for( i = 0; i < dado->quantidade_jogadas; i++ ) {
+        printf( "%d_%d_%d-",
+                dado->jogadas[i].jogador,
+                dado->jogadas[i].ponto.linha,
+                dado->jogadas[i].ponto.coluna );
+    }
+    printf( "\">" );
+
+    printf( "</form>" );
+}
+
+bool esta_vazio( int *tabuleiro, coordenadas posicao ) {
+    return !tabuleiro[LIN * posicao.linha + posicao.coluna];
+}
+
 bool tabuleiro_cheio( int *tabuleiro ) {
     int i;
 
@@ -140,7 +288,7 @@ bool tabuleiro_cheio( int *tabuleiro ) {
 }
 
 int verificar_se_terminou( int *tabuleiro ) {
-    int i, j, soma;
+    int i;
 
     // VERIFICA LINHA
     for( i = 0; i < LIN; i++ ) {
@@ -173,30 +321,6 @@ int verificar_se_terminou( int *tabuleiro ) {
     return 0;
 }
 
-void receber_dados( char *data, dados *dado ) {
-    unsigned int tamanho;
-
-    dado->atual.ponto.coluna = -1;
-    dado->atual.ponto.linha = -1;
-
-    if( data != NULL && sscanf( data, "%u", &tamanho ) == 1 ) {
-        char *string = calloc( tamanho + 1, sizeof( char ) );
-        if( !string ) {
-            return;
-        }
-
-        fgets( string, tamanho + 1, stdin );
-
-        receber_modo_jogo( string, dado );
-        receber_jogada_atual( string, dado );
-        receber_jogadas( string, dado );
-
-        dado->atual.jogador = determinar_jogador( dado );
-
-        free( string );
-    }
-}
-
 unsigned int determinar_jogador( dados *dado ) {
     if( dado->quantidade_jogadas == 0 ||
         dado->jogadas[dado->quantidade_jogadas - 1].jogador % 2 == 0 ) {
@@ -204,102 +328,4 @@ unsigned int determinar_jogador( dados *dado ) {
     } else {
         return P2;
     }
-}
-
-void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro ) {
-    int i;
-    for( i = 0; i < dado->quantidade_jogadas; i++ ) {
-        tabuleiro[LIN * dado->jogadas[i].ponto.linha + dado->jogadas[i].ponto.coluna] =
-            dado->jogadas[i].jogador;
-    }
-}
-
-void add_jogada_as_jogadas( jogada jogo, dados *dado ) {
-    dado->jogadas[dado->quantidade_jogadas] = jogo;
-    dado->quantidade_jogadas++;
-}
-
-void receber_modo_jogo( char *string, dados *dado ) {
-    char *p;
-    p = strstr( string, "modo=" );
-    sscanf( p, "modo=%u%*s", &dado->modo_jogo );
-}
-
-void receber_jogada_atual( char *string, dados *dado ) {
-    char *p;
-    p = strstr( string, "x=" );
-    if( p ) {
-        if( !sscanf( p, "x=%u&y=%u", &dado->atual.ponto.coluna, &dado->atual.ponto.linha ) ) {
-            dado->atual.ponto.coluna = 100;
-            dado->atual.ponto.linha = 100;
-        }
-        dado->atual.ponto.coluna -= 1;
-        dado->atual.ponto.linha -= 1;
-    }
-}
-
-void receber_jogadas( char *string, dados *dado ) {
-    char *p;
-    p = strstr( string, "jogadas=" );
-    p += strlen( "jogadas=" );
-    if( *( p + 1 ) != '\0' ) {
-        int i = 0;
-        while( sscanf( p,
-                       "%u_%u_%u-",
-                       &dado->jogadas[i].jogador,
-                       &dado->jogadas[i].ponto.linha,
-                       &dado->jogadas[i].ponto.coluna ) > 0 ) {
-            i++;
-            p = strstr( p, "-" ) + 1;
-        }
-        dado->quantidade_jogadas = i;
-    } else {
-        dado->jogadas[0].jogador = -1;
-        dado->quantidade_jogadas = 0;
-    }
-}
-
-void print_tabuleiro( int *tabuleiro ) {
-    int i, j;
-
-    printf( "<table id=\"tabuleiro\">" );
-
-    for( i = 0; i < LIN; i++ ) {
-        printf( "<tr>" );
-        for( j = 0; j < COL; j++ ) {
-            printf( "<td>%d</td>", tabuleiro[LIN * i + j] );
-        }
-        printf( "</tr>" );
-    }
-
-    printf( "</table>" );
-}
-
-void print_jogo( dados *dado, int *tabuleiro ) {
-    print_tabuleiro( tabuleiro );
-    print_form( dado );
-}
-
-void print_form( dados *dado ) {
-    int i;
-
-    printf( "<form method=\"POST\" action=\"main\">" );
-    printf( "<input type=\"hidden\" id=\"modo\"name=\"modo\" value=\"%u\">", dado->modo_jogo );
-    printf( "Coordenada x: <input type=\"number\" name=\"x\"><br>" );
-    printf( "Coordenada y: <input type=\"number\" name=\"y\"><br>" );
-    printf( "<input type=\"submit\" value=\"Enviar\">" );
-
-    printf( "<input type=\"hidden\" name=\"jogadas\" value=\"" );
-
-    for( i = 0; i < dado->quantidade_jogadas; i++ ) {
-        printf( "%u_%u_%u-",
-                dado->jogadas[i].jogador,
-                dado->jogadas[i].ponto.linha,
-                dado->jogadas[i].ponto.coluna );
-    }
-    printf( "\">" );
-}
-
-bool esta_vazio( int *tabuleiro, coordenadas posicao ) {
-    return !tabuleiro[LIN * posicao.linha + posicao.coluna];
 }
