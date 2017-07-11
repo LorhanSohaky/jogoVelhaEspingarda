@@ -235,9 +235,7 @@ void print_tabuleiro( int *tabuleiro ) {
                         i + 1 );
             } else if( tabuleiro[LIN * i + j] == P1 ) {
                 printf( "<td><img src=\"http://cap.dc.ufscar.br/~740951/jogo/img/x.png\" "
-                        "width=\"150px\"></td>",
-                        j + 1,
-                        i + 1 );
+                        "width=\"150px\"></td>" );
             } else if( tabuleiro[LIN * i + j] == P2 ) {
                 printf( "<td><img src=\"http://cap.dc.ufscar.br/~740951/jogo/img/bola.png\" "
                         "width=\"150px\"></td>" );
