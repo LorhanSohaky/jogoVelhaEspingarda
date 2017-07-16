@@ -37,6 +37,7 @@ int verificar_se_terminou( int *tabuleiro );
 void print_tabuleiro( int *tabuleiro );
 void print_jogo( dados *dado, int *tabuleiro );
 void print_form( dados *dado );
+void print_resultado( dados *dado, int *tabuleiro );
 
 void receber_dados( char *data, dados *dado );
 void receber_modo_jogo( char *string, dados *dado );
@@ -46,73 +47,64 @@ void receber_jogadas( char *string, dados *dado );
 void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro );
 void add_jogada_as_jogadas( jogada jogo, dados *dado );
 
+void jogar( dados *dado, int *tabuleiro );
+int jogada_usuario( dados *dado, int *tabuleiro );
+
 int main() {
     dados dado;
     char *data;
     int *tabuleiro = calloc( MAX, sizeof( int ) );
 
     printf( "%s%c%c\n", "Content-Type:text/html;charset=utf-8", 13, 10 );
-    printf( "<HEAD><TITLE>Jogo da velha</TITLE>" );
+    printf( "<HEAD><TITLE>Jogo do Oeste</TITLE>" );
     printf( "<META CHARSET=\"UTF-8\"></HEAD>" );
+    printf( " <link rel=\"stylesheet\" type=\"text/css\" "
+            "href=\"http://cap.dc.ufscar.br/~740951/jogo/css/jogo.css\"> " );
     printf( "<BODY>" );
 
     data = getenv( "CONTENT_LENGTH" );
     receber_dados( data, &dado );
 
-    add_jogadas_ao_tabuleiro( &dado, tabuleiro );
+    jogar( &dado, tabuleiro );
 
-    if( dado.modo_jogo == PC ) {
-        dado.atual.jogador = P1;
-
-        if( dado.atual.ponto.linha >= 0 && dado.atual.ponto.linha < LIN &&
-            dado.atual.ponto.coluna >= 0 && dado.atual.ponto.coluna < COL ) {
-            if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
-                add_jogada_as_jogadas( dado.atual, &dado );
-                add_jogadas_ao_tabuleiro( &dado, tabuleiro );
-
-                if( !verificar_se_terminou( tabuleiro ) && !tabuleiro_cheio( tabuleiro ) ) {
-                    jogada pc = sortear_jogaca_pc( dado.atual, tabuleiro );
-
-                    add_jogada_as_jogadas( pc, &dado ); // Para adicionar a jogada do PC
-                }
-            }
-        }
-    } else {
-        if( dado.atual.ponto.linha >= 0 && dado.atual.ponto.linha < LIN &&
-            dado.atual.ponto.coluna >= 0 && dado.atual.ponto.coluna < COL ) {
-            if( esta_vazio( tabuleiro, dado.atual.ponto ) ) {
-                add_jogada_as_jogadas( dado.atual, &dado );
-                add_jogadas_ao_tabuleiro( &dado, tabuleiro );
-            }
-        }
-    }
-
-    add_jogadas_ao_tabuleiro( &dado, tabuleiro );
-    if( !tabuleiro_cheio( tabuleiro ) && !verificar_se_terminou( tabuleiro ) ) {
-        print_jogo( &dado, tabuleiro );
-    } else {
-        int jogador = verificar_se_terminou( tabuleiro );
-        if( dado.modo_jogo == PC ) {
-            if( jogador == P1 ) {
-                printf( "<h1>Você é foda!</h1>" );
-            } else {
-                printf( "<h1>Você é um bosta...</h1>" );
-            }
-        } else {
-            if( jogador == P1 ) {
-                printf( "<h1>Jogador 1 ganhou!</h1>" );
-            } else if( jogador == P2 ) {
-                printf( "<h1>Jogador 2 ganhou!</h1>" );
-            } else {
-                printf( "<h1>Os dois são uns bostas!</h1>" );
-            }
-        }
-    }
     free( tabuleiro );
 
     printf( "<script type=\"text/javascript\" "
-            "src=\"http://cap.dc.ufscar.br/~740951/jogo/script.js\"></script>" );
+            "src=\"http://cap.dc.ufscar.br/~740951/jogo/js/script.js\"></script>" );
     printf( "</BODY>" );
+    return 0;
+}
+
+void jogar( dados *dado, int *tabuleiro ) {
+    add_jogadas_ao_tabuleiro( dado, tabuleiro );
+
+    if( dado->modo_jogo == PC ) {
+        dado->atual.jogador = P1;
+
+        if( jogada_usuario( dado, tabuleiro ) && !verificar_se_terminou( tabuleiro ) &&
+            !tabuleiro_cheio( tabuleiro ) ) {
+            jogada pc = sortear_jogaca_pc( dado->atual, tabuleiro );
+            add_jogada_as_jogadas( pc, dado ); // Para adicionar a jogada do PC
+        }
+    } else {
+        jogada_usuario( dado, tabuleiro );
+    }
+
+    add_jogadas_ao_tabuleiro( dado, tabuleiro );
+    if( !tabuleiro_cheio( tabuleiro ) && !verificar_se_terminou( tabuleiro ) ) {
+        print_jogo( dado, tabuleiro );
+    } else {
+        print_resultado( dado, tabuleiro );
+    }
+}
+
+int jogada_usuario( dados *dado, int *tabuleiro ) {
+    if( dado->atual.ponto.linha < LIN && dado->atual.ponto.coluna < COL &&
+        esta_vazio( tabuleiro, dado->atual.ponto ) ) {
+        add_jogada_as_jogadas( dado->atual, dado );
+        add_jogadas_ao_tabuleiro( dado, tabuleiro );
+        return 1;
+    }
     return 0;
 }
 
@@ -214,6 +206,33 @@ void receber_jogadas( char *string, dados *dado ) {
     }
 }
 
+void print_resultado( dados *dado, int *tabuleiro ) {
+    int jogador = verificar_se_terminou( tabuleiro );
+    if( dado->modo_jogo == PC ) {
+        if( jogador == P1 ) {
+            printf( "<meta http-equiv=\"refresh\" content=\"0; "
+                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/vitoria.html\" />" );
+        } else if( jogador == P2 ) {
+            printf( "<meta http-equiv=\"refresh\" content=\"0; "
+                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/derrota.html\" />" );
+        } else {
+            printf( "<meta http-equiv=\"refresh\" content=\"0; "
+                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/empate.html\" />" );
+        }
+    } else {
+        if( jogador == P1 ) {
+            printf( "<meta http-equiv=\"refresh\" content=\"0; "
+                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/vitoria.html\" />" );
+        } else if( jogador == P2 ) {
+            printf( "<meta http-equiv=\"refresh\" content=\"0; "
+                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/derrota.html\" />" );
+        } else {
+            printf( "<meta http-equiv=\"refresh\" content=\"0; "
+                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/empate.html\" />" );
+        }
+    }
+}
+
 void print_jogo( dados *dado, int *tabuleiro ) {
     print_tabuleiro( tabuleiro );
     print_form( dado );
@@ -229,16 +248,16 @@ void print_tabuleiro( int *tabuleiro ) {
         for( j = 0; j < COL; j++ ) {
             if( tabuleiro[LIN * i + j] == 0 ) {
                 printf( "<td><img onclick=\"setXY(%u,%u);\" "
-                        "src=\"http://cap.dc.ufscar.br/~740951/jogo/img/vazio.png\" "
-                        "width=\"150px\"></td>",
+                        "src=\"http://cap.dc.ufscar.br/~740951/jogo/img/space.png\" "
+                        "width=\"150px\" height=\"150px\" style=\"opacity:0.7;\"></td>",
                         j + 1,
                         i + 1 );
             } else if( tabuleiro[LIN * i + j] == P1 ) {
-                printf( "<td><img src=\"http://cap.dc.ufscar.br/~740951/jogo/img/x.png\" "
-                        "width=\"150px\"></td>" );
+                printf( "<td><img src=\"http://cap.dc.ufscar.br/~740951/jogo/img/X.png\" "
+                        "width=\"150px\" height=\"150px\"></td>" );
             } else if( tabuleiro[LIN * i + j] == P2 ) {
-                printf( "<td><img src=\"http://cap.dc.ufscar.br/~740951/jogo/img/bola.png\" "
-                        "width=\"150px\"></td>" );
+                printf( "<td><img src=\"http://cap.dc.ufscar.br/~740951/jogo/img/BOLA.png\" "
+                        "width=\"150px\" height=\"150px\"></td>" );
             }
         }
         printf( "</tr>" );
