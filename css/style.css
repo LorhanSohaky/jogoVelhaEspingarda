@@ -1,0 +1,52 @@
+html{
+	margin:0px;
+	padding:0px;
+	height:100%;
+}
+
+.titulo{
+	/*background-color: black;*/
+	width: inherit;
+	margin-left: 425px;
+	margin-top:150px;
+	transform: rotate(20deg);
+	color: white;
+	font-size: 200px;
+}
+.row {
+    margin-right: 0px !important;
+    margin-left: 0px !important;
+    /*background-color: lightgray;*/
+}
+
+body{
+	background-image: url(../img/bg-inicio.jpg);
+	background-size: 100% 100%;
+	background-repeat:no-repeat;
+	background-position:center;
+}
+
+.btn-pvp{
+	margin-top: 50px;
+	margin-left: 40%;
+}
+.btn-pve{
+	margin-top: 0;
+	margin-left: 39.5%;
+}
+
+.video{
+	margin-top: 200px;
+	margin-left: auto;
+	margin-right: auto;
+	width:550px;
+}
+
+.bibliografica{
+	margin-right: 0px !important;
+    margin-left: 0px !important;
+    color: #fff;
+    text-shadow:0px 0px 2px #000;
+    /*background-color: lightgray;*/
+
+}
