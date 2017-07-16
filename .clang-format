@@ -1,0 +1,111 @@
+---
+#Linguagem de programação
+Language:        Cpp
+
+#Opções padrões de formatação (estilos)
+# BasedOnStyle:  Google
+
+#Alinhamento dos argumentos de uma função
+AlignAfterOpenBracket:  Align
+
+#Alinhamento dos operadores de atribuição consecutivos
+#AlignConsecutiveAssignments: true
+
+#Alinhamento da declaração dos tipos
+#AlignConsecutiveDeclarations: true
+
+#Alinha a esquerda
+AlignEscapedNewlinesLeft: false
+
+#Alinha operandos de uma expressão
+AlignOperands:   false
+
+#Alinha os comentários consecutivos à direita
+AlignTrailingComments: true
+
+#Coloca todos os parâmetros de uma declaração(função) na linha de baixo
+AllowAllParametersOfDeclarationOnNextLine: false
+
+#Quando um bloco de código {} é pequeno, o código é colocado em uma linha
+AllowShortBlocksOnASingleLine: true
+
+#Quando um switch case é curto, o caso é colocado em uma linha
+AllowShortCaseLabelsOnASingleLine: false
+
+#Quando uma função é curta, o código fica em uma única linha
+AllowShortFunctionsOnASingleLine:  None
+
+#Quando um if é curto fica tudo em uma única linha
+AllowShortIfStatementsOnASingleLine: false
+
+#Laço de repetição pequeno em uma única linha
+AllowShortLoopsOnASingleLine: false
+
+#Quebra de linha apos definição do tipo de retorno da função
+AlwaysBreakAfterDefinitionReturnType: false
+
+#Quebra de linha em string
+AlwaysBreakBeforeMultilineStrings: false
+
+#Quebra a linha após a definição de template
+#AlwaysBreakTemplateDeclarations: true
+
+#Quando falso os argumentos de uma chamada de função serão alinhados na mesma linha ou nas linhas seguintes
+BinPackArguments: false
+
+#Quando falso os parâmetros de função serão alinhados na mesma linha ou nas linhas seguintes
+BinPackParameters: false
+
+#Quebra de linha após operadores binários(+)
+BreakBeforeBinaryOperators:  false
+
+#Quebra de linha em operadores ternários
+BreakBeforeTernaryOperators: false
+
+#Quebra de linha no construtor
+#BreakConstructorInitializersBeforeComma: true
+
+#Quebra a linha para strings muito grandes
+#BreakStringLiterals: true
+
+# Limite de colunas (formatação horizontal - clean code)
+ColumnLimit:     100
+
+#Alinhamento dos case
+IndentCaseLabels: true
+
+#Número de colunas de endentação
+IndentWidth:     4
+
+#Número do máximo de linhas vazias
+MaxEmptyLinesToKeep: 1
+
+#Espaço dentro dos parenteses
+SpacesInParentheses: true
+
+#Permite o espaço no começo do bloco de código {
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+#Alinhamento do ponteiro
+PointerAlignment: Right
+
+#Espaçamento entre o código e o comentário
+SpacesBeforeTrailingComments: 1
+
+#Formatação das chaves {}
+BreakBeforeBraces: Attach
+
+#Espaço dentro dos colchetes []
+SpacesInSquareBrackets: false
+
+#Espaço dentro de parenteses vazios
+SpaceInEmptyParentheses: false
+
+#Espaço antes do operador de atribuição
+SpaceBeforeAssignmentOperators: true
+
+#Colunas para endentação de continuidade
+ContinuationIndentWidth: 4
+
+#Espaço antes do parentese
+SpaceBeforeParens: Never
