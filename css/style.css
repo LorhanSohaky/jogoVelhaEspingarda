@@ -14,9 +14,8 @@ html{
 	font-size: 200px;
 }
 .row {
-    margin-right: 0px !important;
+    margin-right: 0px;
     margin-left: 0px;
-    /*background-color: lightgray;*/
 }
 
 body{
@@ -44,7 +43,7 @@ body{
 
 .bibliografica{
 	margin-right: 0px;
-    margin-left: 0px !important;
+    margin-left: 0px;
     color: #fff;
     text-shadow:0px 0px 2px #000;
     /*background-color: lightgray;*/
