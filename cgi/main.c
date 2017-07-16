@@ -126,8 +126,9 @@ jogada sortear_jogaca_pc( jogada atual, int *tabuleiro ) {
 
 void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro ) {
     int i;
-    int linha, coluna;
+
     for( i = 0; i < dado->quantidade_jogadas; i++ ) {
+        int linha, coluna;
         linha = dado->jogadas[i].ponto.linha;
         coluna = dado->jogadas[i].ponto.coluna;
         tabuleiro[LIN * linha + coluna] = dado->jogadas[i].jogador;
@@ -142,7 +143,7 @@ void add_jogada_as_jogadas( jogada jogo, dados *dado ) {
 void receber_dados( char *data, dados *dado ) {
     unsigned int tamanho;
 
-    if( data != NULL && sscanf( data, "%d", &tamanho ) == 1 ) {
+    if( data != NULL && sscanf( data, "%u", &tamanho ) == 1 ) {
         char *string = calloc( tamanho + 1, sizeof( char ) );
         if( !string ) {
             return;
@@ -168,14 +169,14 @@ void receber_dados( char *data, dados *dado ) {
 void receber_modo_jogo( char *string, dados *dado ) {
     char *p;
     p = strstr( string, "modo=" );
-    sscanf( p, "modo=%d%*s", &dado->modo_jogo );
+    sscanf( p, "modo=%u%*s", &dado->modo_jogo );
 }
 
 void receber_jogada_atual( char *string, dados *dado ) {
     char *p;
     p = strstr( string, "x=" );
     if( p ) {
-        if( !sscanf( p, "x=%d&y=%d", &dado->atual.ponto.coluna, &dado->atual.ponto.linha ) ) {
+        if( !sscanf( p, "x=%u&y=%u", &dado->atual.ponto.coluna, &dado->atual.ponto.linha ) ) {
             dado->atual.ponto.coluna = 10; // Valor acima do MAX
             dado->atual.ponto.linha = 10;  // Valor acima do MAX
             return;
@@ -187,12 +188,13 @@ void receber_jogada_atual( char *string, dados *dado ) {
 
 void receber_jogadas( char *string, dados *dado ) {
     char *p;
-    int i = 0;
     p = strstr( string, "jogadas=" );
     p += strlen( "jogadas=" );
     if( *( p + 1 ) != '\0' ) {
+        int i = 0;
+
         while( sscanf( p,
-                       "%d_%d_%d-",
+                       "%u_%u_%u-",
                        &dado->jogadas[i].jogador,
                        &dado->jogadas[i].ponto.linha,
                        &dado->jogadas[i].ponto.coluna ) > 0 ) {
@@ -239,7 +241,7 @@ void print_jogo( dados *dado, int *tabuleiro ) {
 }
 
 void print_tabuleiro( int *tabuleiro ) {
-    int i, j;
+    unsigned int i, j;
 
     printf( "<table id=\"tabuleiro\">" );
 
@@ -270,14 +272,14 @@ void print_form( dados *dado ) {
     int i;
 
     printf( "<form method=\"POST\" id=\"formulario\" action=\"main\">" );
-    printf( "<input type=\"hidden\" id=\"modo\"name=\"modo\" value=\"%d\">", dado->modo_jogo );
+    printf( "<input type=\"hidden\" id=\"modo\"name=\"modo\" value=\"%u\">", dado->modo_jogo );
     printf( "<input type=\"hidden\" id=\"x\" name=\"x\"><br>" );
     printf( "<input type=\"hidden\" id=\"y\" name=\"y\"><br>" );
 
     printf( "<input type=\"hidden\" name=\"jogadas\" value=\"" );
 
     for( i = 0; i < dado->quantidade_jogadas; i++ ) {
-        printf( "%d_%d_%d-",
+        printf( "%u_%u_%u-",
                 dado->jogadas[i].jogador,
                 dado->jogadas[i].ponto.linha,
                 dado->jogadas[i].ponto.coluna );
