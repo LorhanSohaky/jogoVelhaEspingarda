@@ -210,28 +210,16 @@ void receber_jogadas( char *string, dados *dado ) {
 
 void print_resultado( dados *dado, int *tabuleiro ) {
     int jogador = verificar_se_terminou( tabuleiro );
-    if( dado->modo_jogo == PC ) {
-        if( jogador == P1 ) {
-            printf( "<meta http-equiv=\"refresh\" content=\"0; "
-                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/vitoria.html\" />" );
-        } else if( jogador == P2 ) {
-            printf( "<meta http-equiv=\"refresh\" content=\"0; "
-                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/derrota.html\" />" );
-        } else {
-            printf( "<meta http-equiv=\"refresh\" content=\"0; "
-                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/empate.html\" />" );
-        }
+
+    if( jogador == P1 ) {
+        printf( "<meta http-equiv=\"refresh\" content=\"0; "
+                "url=http://cap.dc.ufscar.br/~740951/jogo/html/vitoria.html\" />" );
+    } else if( jogador == P2 ) {
+        printf( "<meta http-equiv=\"refresh\" content=\"0; "
+                "url=http://cap.dc.ufscar.br/~740951/jogo/html/derrota.html\" />" );
     } else {
-        if( jogador == P1 ) {
-            printf( "<meta http-equiv=\"refresh\" content=\"0; "
-                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/vitoria.html\" />" );
-        } else if( jogador == P2 ) {
-            printf( "<meta http-equiv=\"refresh\" content=\"0; "
-                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/derrota.html\" />" );
-        } else {
-            printf( "<meta http-equiv=\"refresh\" content=\"0; "
-                    "url=http://cap.dc.ufscar.br/~740951/jogo/html/empate.html\" />" );
-        }
+        printf( "<meta http-equiv=\"refresh\" content=\"0; "
+                "url=http://cap.dc.ufscar.br/~740951/jogo/html/empate.html\" />" );
     }
 }
 
