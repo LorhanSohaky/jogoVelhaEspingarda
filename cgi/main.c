@@ -34,6 +34,11 @@ unsigned int determinar_jogador( dados *dado );
 jogada sortear_jogaca_pc( jogada atual, int *tabuleiro );
 int verificar_se_terminou( int *tabuleiro );
 
+int verificar_linha( int *tabuleiro );
+int verificar_coluna( int *tabuleiro );
+int verificar_diagonal_principal( int *tabuleiro );
+int verificar_diagonal_secundaria( int *tabuleiro );
+
 void print_tabuleiro( int *tabuleiro );
 void print_jogo( dados *dado, int *tabuleiro );
 void print_form( dados *dado );
@@ -294,34 +299,108 @@ bool tabuleiro_cheio( int *tabuleiro ) {
 }
 
 int verificar_se_terminou( int *tabuleiro ) {
+    int resultado;
+
+    if( ( resultado = verificar_linha( tabuleiro ) ) ) {
+        return resultado;
+    } else if( ( resultado = verificar_coluna( tabuleiro ) ) ) {
+        return resultado;
+    } else if( ( resultado = verificar_diagonal_principal( tabuleiro ) ) ) {
+        return resultado;
+    } else if( ( resultado = verificar_diagonal_secundaria( tabuleiro ) ) ) {
+        return resultado;
+    }
+
+    return 0;
+}
+
+int verificar_linha( int *tabuleiro ) {
     int i;
 
-    // VERIFICA LINHA
     for( i = 0; i < LIN; i++ ) {
-        if( tabuleiro[LIN * i + 0] == tabuleiro[LIN * i + 1] &&
-            tabuleiro[LIN * i + 0] == tabuleiro[LIN * i + 2] ) {
-            return tabuleiro[LIN * i + 0];
+        int referencia = tabuleiro[i * LIN + 0 * COL];
+
+        if( referencia ) {
+            int j, quantidade = 0;
+
+            for( j = 0; j < COL; j++ ) {
+                if( referencia == tabuleiro[i * LIN + j] ) {
+                    quantidade++;
+                }
+            }
+
+            if( quantidade == COL ) {
+                return referencia;
+            }
         }
     }
 
-    // VERIFICA COLUNA
-    for( i = 0; i < COL; i++ ) {
-        if( tabuleiro[LIN * 0 + i] == tabuleiro[LIN * 1 + i] &&
-            tabuleiro[LIN * 0 + i] == tabuleiro[LIN * 2 + i] ) {
-            return tabuleiro[LIN * 0 + i];
+    return 0;
+}
+
+int verificar_coluna( int *tabuleiro ) {
+    int j;
+
+    for( j = 0; j < COL; j++ ) {
+        int referencia = tabuleiro[0 * LIN + j];
+
+        if( referencia ) {
+            int i, quantidade = 1;
+
+            for( i = 1; i < LIN; i++ ) {
+                if( referencia == tabuleiro[i * LIN + j] ) {
+                    quantidade++;
+                }
+            }
+
+            if( quantidade == LIN ) {
+                return referencia;
+            }
         }
     }
 
-    // VERIFICAR DIAGONAL SECUNDARIA
-    if( tabuleiro[LIN * 0 + 2] == tabuleiro[LIN * 1 + 1] &&
-        tabuleiro[LIN * 0 + 2] == tabuleiro[LIN * 2 + 0] ) {
-        return tabuleiro[LIN * 0 + 2];
+    return 0;
+}
+
+int verificar_diagonal_principal( int *tabuleiro ) {
+    int referencia;
+
+    referencia = tabuleiro[0 * LIN + 0 * COL];
+
+    if( referencia ) {
+        int i, soma = 1;
+
+        for( i = 1; i < LIN; i++ ) {
+            if( referencia == tabuleiro[i * LIN + i] ) {
+                soma++;
+            }
+        }
+
+        if( soma == LIN ) {
+            return referencia;
+        }
     }
 
-    // VERIFICAR DIAGONAL PRIMARIA
-    if( tabuleiro[LIN * 0 + 0] == tabuleiro[LIN * 1 + 1] &&
-        tabuleiro[LIN * 0 + 0] == tabuleiro[LIN * 2 + 2] ) {
-        return tabuleiro[LIN * 0 + 0];
+    return 0;
+}
+
+int verificar_diagonal_secundaria( int *tabuleiro ) {
+    int referencia;
+
+    referencia = tabuleiro[0 * LIN + COL - 1];
+
+    if( referencia ) {
+        int j, soma = 1;
+
+        for( j = COL - 1; j > 0; j-- ) {
+            if( referencia == tabuleiro[( LIN - j ) * LIN + j - 1] ) {
+                soma++;
+            }
+        }
+
+        if( soma == COL ) {
+            return referencia;
+        }
     }
 
     return 0;
