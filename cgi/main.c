@@ -28,29 +28,30 @@ typedef struct {
     jogada atual;
 } dados;
 
-bool esta_vazio( int *tabuleiro, coordenadas posicao );
-bool tabuleiro_cheio( int *tabuleiro );
-unsigned int determinar_jogador( dados *dado );
-jogada sortear_jogaca_pc( jogada atual, int *tabuleiro );
-int verificar_se_terminou( int *tabuleiro );
+bool esta_vazio( const int *tabuleiro, const coordenadas posicao );
+bool tabuleiro_cheio( const int *tabuleiro );
+unsigned int determinar_jogador( const dados *dado );
 
-int verificar_linha( int *tabuleiro );
-int verificar_coluna( int *tabuleiro );
-int verificar_diagonal_principal( int *tabuleiro );
-int verificar_diagonal_secundaria( int *tabuleiro );
+int verificar_se_terminou( const int *tabuleiro );
+int verificar_linha( const int *tabuleiro );
+int verificar_coluna( const int *tabuleiro );
+int verificar_diagonal_principal( const int *tabuleiro );
+int verificar_diagonal_secundaria( const int *tabuleiro );
 
-void print_tabuleiro( int *tabuleiro );
-void print_jogo( dados *dado, int *tabuleiro );
-void print_form( dados *dado );
-void print_resultado( dados *dado, int *tabuleiro );
+jogada sortear_jogaca_pc( const jogada atual, const int *tabuleiro );
 
-void receber_dados( char *data, dados *dado );
-void receber_modo_jogo( char *string, dados *dado );
-void receber_jogada_atual( char *string, dados *dado );
-void receber_jogadas( char *string, dados *dado );
+void print_tabuleiro( const int *tabuleiro );
+void print_jogo( const dados *dado, const int *tabuleiro );
+void print_form( const dados *dado );
+void print_resultado( const dados *dado, const int *tabuleiro );
+
+void receber_dados( const char *data, dados *dado );
+void receber_modo_jogo( const char *string, dados *dado );
+void receber_jogada_atual( const char *string, dados *dado );
+void receber_jogadas( const char *string, dados *dado );
 
 void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro );
-void add_jogada_as_jogadas( jogada jogo, dados *dado );
+void add_jogada_as_jogadas( const jogada jogo, dados *dado );
 
 void jogar( dados *dado, int *tabuleiro );
 int jogada_usuario( dados *dado, int *tabuleiro );
@@ -113,7 +114,7 @@ int jogada_usuario( dados *dado, int *tabuleiro ) {
     return 0;
 }
 
-jogada sortear_jogaca_pc( jogada atual, int *tabuleiro ) {
+jogada sortear_jogaca_pc( const jogada atual, const int *tabuleiro ) {
     jogada pc;
 
     pc.jogador = P2;
@@ -140,12 +141,12 @@ void add_jogadas_ao_tabuleiro( dados *dado, int *tabuleiro ) {
     }
 }
 
-void add_jogada_as_jogadas( jogada jogo, dados *dado ) {
+void add_jogada_as_jogadas( const jogada jogo, dados *dado ) {
     dado->jogadas[dado->quantidade_jogadas] = jogo;
     dado->quantidade_jogadas++;
 }
 
-void receber_dados( char *data, dados *dado ) {
+void receber_dados( const char *data, dados *dado ) {
     unsigned int tamanho;
 
     if( data != NULL && sscanf( data, "%u", &tamanho ) == 1 ) {
@@ -171,13 +172,13 @@ void receber_dados( char *data, dados *dado ) {
     }
 }
 
-void receber_modo_jogo( char *string, dados *dado ) {
+void receber_modo_jogo( const char *string, dados *dado ) {
     char *p;
     p = strstr( string, "modo=" );
     sscanf( p, "modo=%u%*s", &dado->modo_jogo );
 }
 
-void receber_jogada_atual( char *string, dados *dado ) {
+void receber_jogada_atual( const char *string, dados *dado ) {
     char *p;
     p = strstr( string, "x=" );
     if( p ) {
@@ -191,7 +192,7 @@ void receber_jogada_atual( char *string, dados *dado ) {
     }
 }
 
-void receber_jogadas( char *string, dados *dado ) {
+void receber_jogadas( const char *string, dados *dado ) {
     char *p;
     p = strstr( string, "jogadas=" );
     p += strlen( "jogadas=" );
@@ -213,7 +214,7 @@ void receber_jogadas( char *string, dados *dado ) {
     }
 }
 
-void print_resultado( dados *dado, int *tabuleiro ) {
+void print_resultado( const dados *dado, const int *tabuleiro ) {
     int jogador = verificar_se_terminou( tabuleiro );
 
     if( jogador == P1 ) {
@@ -228,12 +229,12 @@ void print_resultado( dados *dado, int *tabuleiro ) {
     }
 }
 
-void print_jogo( dados *dado, int *tabuleiro ) {
+void print_jogo( const dados *dado, const int *tabuleiro ) {
     print_tabuleiro( tabuleiro );
     print_form( dado );
 }
 
-void print_tabuleiro( int *tabuleiro ) {
+void print_tabuleiro( const int *tabuleiro ) {
     unsigned int i, j;
 
     printf( "<table id=\"tabuleiro\">" );
@@ -261,7 +262,7 @@ void print_tabuleiro( int *tabuleiro ) {
     printf( "</table>" );
 }
 
-void print_form( dados *dado ) {
+void print_form( const dados *dado ) {
     int i;
 
     printf( "<form method=\"POST\" id=\"formulario\" action=\"main\">" );
@@ -282,11 +283,11 @@ void print_form( dados *dado ) {
     printf( "</form>" );
 }
 
-bool esta_vazio( int *tabuleiro, coordenadas posicao ) {
+bool esta_vazio( const int *tabuleiro, const coordenadas posicao ) {
     return !tabuleiro[LIN * posicao.linha + posicao.coluna];
 }
 
-bool tabuleiro_cheio( int *tabuleiro ) {
+bool tabuleiro_cheio( const int *tabuleiro ) {
     int i;
 
     for( i = 0; i < MAX; i++ ) {
@@ -298,7 +299,7 @@ bool tabuleiro_cheio( int *tabuleiro ) {
     return true;
 }
 
-int verificar_se_terminou( int *tabuleiro ) {
+int verificar_se_terminou( const int *tabuleiro ) {
     int resultado;
 
     if( ( resultado = verificar_linha( tabuleiro ) ) ) {
@@ -314,7 +315,7 @@ int verificar_se_terminou( int *tabuleiro ) {
     return 0;
 }
 
-int verificar_linha( int *tabuleiro ) {
+int verificar_linha( const int *tabuleiro ) {
     int i;
 
     for( i = 0; i < LIN; i++ ) {
@@ -338,7 +339,7 @@ int verificar_linha( int *tabuleiro ) {
     return 0;
 }
 
-int verificar_coluna( int *tabuleiro ) {
+int verificar_coluna( const int *tabuleiro ) {
     int j;
 
     for( j = 0; j < COL; j++ ) {
@@ -362,7 +363,7 @@ int verificar_coluna( int *tabuleiro ) {
     return 0;
 }
 
-int verificar_diagonal_principal( int *tabuleiro ) {
+int verificar_diagonal_principal( const int *tabuleiro ) {
     int referencia;
 
     referencia = tabuleiro[0 * LIN + 0 * COL];
@@ -384,7 +385,7 @@ int verificar_diagonal_principal( int *tabuleiro ) {
     return 0;
 }
 
-int verificar_diagonal_secundaria( int *tabuleiro ) {
+int verificar_diagonal_secundaria( const int *tabuleiro ) {
     int referencia;
 
     referencia = tabuleiro[0 * LIN + COL - 1];
@@ -406,7 +407,7 @@ int verificar_diagonal_secundaria( int *tabuleiro ) {
     return 0;
 }
 
-unsigned int determinar_jogador( dados *dado ) {
+unsigned int determinar_jogador( const dados *dado ) {
     if( dado->quantidade_jogadas == 0 ||
         dado->jogadas[dado->quantidade_jogadas - 1].jogador % 2 == 0 ) {
         return P1;
