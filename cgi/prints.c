@@ -1,9 +1,8 @@
 #include "prints.h"
 #include "datatype.h"
+#include <stdio.h>
 
-void print_resultado( const dados *dado, const int *tabuleiro ) {
-    // int jogador = verificar_se_terminou( tabuleiro );//TODO Arrumar
-    int jogador = 1;
+void print_resultado( const dados *dado, const int *tabuleiro, int jogador ) {
     if( jogador == P1 ) {
         printf( "<meta http-equiv=\"refresh\" content=\"0; "
                 "url=http://cap.dc.ufscar.br/~740951/jogo/html/vitoria.html\" />" );
