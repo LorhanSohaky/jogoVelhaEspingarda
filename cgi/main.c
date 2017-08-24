@@ -1,15 +1,10 @@
+#include "datatype.h"
+#include "prints.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-#define LIN 3
-#define COL 3
-#define MAX ( LIN ) * ( COL )
-
-enum { P1 = 1, P2 = 2 };
-enum { PVP = 1, PC = 2 };
 
 bool esta_vazio( const int *tabuleiro, const coordenadas posicao );
 bool tabuleiro_cheio( const int *tabuleiro );
@@ -78,7 +73,7 @@ void jogar( dados *dado, int *tabuleiro ) {
     if( !tabuleiro_cheio( tabuleiro ) && !verificar_se_terminou( tabuleiro ) ) {
         print_jogo( dado, tabuleiro );
     } else {
-        print_resultado( dado, tabuleiro );
+        print_resultado( dado, tabuleiro, verificar_se_terminou( tabuleiro ) );
     }
 }
 
