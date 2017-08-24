@@ -1,10 +1,6 @@
 #include "prints.h"
 #include "datatype.h"
 
-int main() {
-    return 0;
-}
-
 void print_resultado( const dados *dado, const int *tabuleiro ) {
     // int jogador = verificar_se_terminou( tabuleiro );//TODO Arrumar
     int jogador = 1;
