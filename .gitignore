@@ -1,7 +1,5 @@
-# Directory
-bin/
-obj/
-
+# Output file
+main
 # Prerequisites
 *.d
 
