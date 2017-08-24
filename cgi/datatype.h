@@ -1,5 +1,15 @@
-#ifndef PRINTS_H
-#define PRINTS_H
+#ifndef DATATYPE_H
+#define DATATYPE_H
+
+#define P1 1
+#define P2 2
+
+#define PVP 1
+#define PC 2
+
+#define LIN 3
+#define COL 3
+#define MAX ( LIN ) * ( COL )
 
 typedef struct {
     unsigned int linha;
@@ -17,10 +27,5 @@ typedef struct {
     jogada jogadas[MAX];
     jogada atual;
 } dados;
-
-typedef struct {
-    unsigned int *matriz;
-    unsigned int ordem_matriz;
-} Tabuleiro;
 
 #endif
