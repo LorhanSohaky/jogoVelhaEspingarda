@@ -11,23 +11,6 @@
 enum { P1 = 1, P2 = 2 };
 enum { PVP = 1, PC = 2 };
 
-typedef struct {
-    unsigned int linha;
-    unsigned int coluna;
-} coordenadas;
-
-typedef struct {
-    unsigned int jogador;
-    coordenadas ponto;
-} jogada;
-
-typedef struct {
-    unsigned int modo_jogo;
-    unsigned int quantidade_jogadas;
-    jogada jogadas[MAX];
-    jogada atual;
-} dados;
-
 bool esta_vazio( const int *tabuleiro, const coordenadas posicao );
 bool tabuleiro_cheio( const int *tabuleiro );
 unsigned int determinar_jogador( const dados *dado );
